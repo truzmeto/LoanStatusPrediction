@@ -71,7 +71,7 @@ keep_cols = ["loan_status","loan_amnt", "term","int_rate","installment","grade",
              "verification_status","issue_d","dti","earliest_cr_line","open_acc",
              "revol_bal","revol_util","total_acc"]
 
-df_orig = pd.read_csv("data/loan.csv", usecols=keep_cols,skipfooter=1,skiprows=1)#,low_memory=False)
+df_orig = pd.read_csv("data/loan.csv", usecols=keep_cols,skipfooter=4,skiprows=1)#,low_memory=False)
 ```
 
 
@@ -81,34 +81,34 @@ df.info()
 ```
 
     <class 'pandas.core.frame.DataFrame'>
-    RangeIndex: 9997 entries, 0 to 9996
+    RangeIndex: 421095 entries, 0 to 421094
     Data columns (total 19 columns):
-    loan_amnt              9997 non-null int64
-    term                   9997 non-null object
-    int_rate               9997 non-null object
-    installment            9997 non-null float64
-    grade                  9997 non-null object
-    sub_grade              9997 non-null object
-    emp_length             9448 non-null object
-    home_ownership         9997 non-null object
-    annual_inc             9997 non-null float64
-    verification_status    9997 non-null object
-    issue_d                9997 non-null object
-    loan_status            9997 non-null object
-    purpose                9997 non-null object
-    dti                    9997 non-null float64
-    earliest_cr_line       9997 non-null object
-    open_acc               9997 non-null int64
-    revol_bal              9997 non-null int64
-    revol_util             9992 non-null object
-    total_acc              9997 non-null int64
+    loan_amnt              421095 non-null int64
+    term                   421095 non-null object
+    int_rate               421095 non-null object
+    installment            421095 non-null float64
+    grade                  421095 non-null object
+    sub_grade              421095 non-null object
+    emp_length             397278 non-null object
+    home_ownership         421095 non-null object
+    annual_inc             421095 non-null float64
+    verification_status    421095 non-null object
+    issue_d                421095 non-null object
+    loan_status            421095 non-null object
+    purpose                421095 non-null object
+    dti                    421093 non-null float64
+    earliest_cr_line       421095 non-null object
+    open_acc               421095 non-null int64
+    revol_bal              421095 non-null int64
+    revol_util             420933 non-null object
+    total_acc              421095 non-null int64
     dtypes: float64(3), int64(4), object(12)
-    memory usage: 1.4+ MB
+    memory usage: 61.0+ MB
 
 
 
 ```python
-df.head()
+df.tail()
 ```
 
 
@@ -155,114 +155,114 @@ df.head()
   </thead>
   <tbody>
     <tr>
-      <th>0</th>
-      <td>24700</td>
+      <th>421090</th>
+      <td>10000</td>
       <td>36 months</td>
       <td>11.99%</td>
-      <td>820.28</td>
-      <td>C</td>
-      <td>C1</td>
-      <td>10+ years</td>
-      <td>MORTGAGE</td>
-      <td>65000.0</td>
-      <td>Not Verified</td>
-      <td>Dec-2015</td>
-      <td>Fully Paid</td>
-      <td>small_business</td>
-      <td>16.06</td>
-      <td>Dec-1999</td>
-      <td>22</td>
-      <td>21470</td>
-      <td>19.2%</td>
-      <td>38</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>17925</td>
-      <td>60 months</td>
-      <td>17.27%</td>
-      <td>448.09</td>
-      <td>D</td>
-      <td>D3</td>
-      <td>10+ years</td>
-      <td>OWN</td>
-      <td>39000.0</td>
-      <td>Source Verified</td>
-      <td>Dec-2015</td>
-      <td>Current</td>
-      <td>debt_consolidation</td>
-      <td>27.78</td>
-      <td>Sep-2002</td>
-      <td>10</td>
-      <td>19614</td>
-      <td>76%</td>
-      <td>21</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>9000</td>
-      <td>36 months</td>
-      <td>8.49%</td>
-      <td>284.07</td>
+      <td>332.10</td>
       <td>B</td>
-      <td>B1</td>
+      <td>B5</td>
       <td>8 years</td>
-      <td>MORTGAGE</td>
-      <td>47000.0</td>
-      <td>Not Verified</td>
-      <td>Dec-2015</td>
+      <td>RENT</td>
+      <td>31000.0</td>
+      <td>Verified</td>
+      <td>Jan-2015</td>
       <td>Fully Paid</td>
       <td>debt_consolidation</td>
-      <td>8.43</td>
-      <td>Nov-2000</td>
-      <td>12</td>
-      <td>9747</td>
-      <td>26.7%</td>
-      <td>22</td>
+      <td>28.69</td>
+      <td>Sep-2004</td>
+      <td>9</td>
+      <td>14037</td>
+      <td>82.1%</td>
+      <td>15</td>
     </tr>
     <tr>
-      <th>3</th>
-      <td>11550</td>
+      <th>421091</th>
+      <td>24000</td>
+      <td>36 months</td>
+      <td>11.99%</td>
+      <td>797.03</td>
+      <td>B</td>
+      <td>B5</td>
+      <td>10+ years</td>
+      <td>MORTGAGE</td>
+      <td>79000.0</td>
+      <td>Verified</td>
+      <td>Jan-2015</td>
+      <td>Fully Paid</td>
+      <td>home_improvement</td>
+      <td>3.90</td>
+      <td>Mar-1974</td>
+      <td>5</td>
+      <td>8621</td>
+      <td>84.5%</td>
+      <td>23</td>
+    </tr>
+    <tr>
+      <th>421092</th>
+      <td>12000</td>
       <td>60 months</td>
-      <td>16.59%</td>
-      <td>284.51</td>
+      <td>19.99%</td>
+      <td>317.86</td>
+      <td>E</td>
+      <td>E3</td>
+      <td>1 year</td>
+      <td>RENT</td>
+      <td>64400.0</td>
+      <td>Source Verified</td>
+      <td>Jan-2015</td>
+      <td>Charged Off</td>
+      <td>debt_consolidation</td>
+      <td>27.19</td>
+      <td>Oct-2003</td>
+      <td>17</td>
+      <td>8254</td>
+      <td>30.6%</td>
+      <td>20</td>
+    </tr>
+    <tr>
+      <th>421093</th>
+      <td>13000</td>
+      <td>60 months</td>
+      <td>15.99%</td>
+      <td>316.07</td>
       <td>D</td>
       <td>D2</td>
       <td>5 years</td>
       <td>RENT</td>
-      <td>38000.0</td>
-      <td>Not Verified</td>
-      <td>Dec-2015</td>
+      <td>35000.0</td>
+      <td>Verified</td>
+      <td>Jan-2015</td>
       <td>Charged Off</td>
-      <td>credit_card</td>
-      <td>21.07</td>
-      <td>Jan-2011</td>
+      <td>debt_consolidation</td>
+      <td>30.90</td>
+      <td>Sep-2003</td>
       <td>9</td>
-      <td>7179</td>
-      <td>39.7%</td>
-      <td>12</td>
+      <td>11031</td>
+      <td>61.3%</td>
+      <td>22</td>
     </tr>
     <tr>
-      <th>4</th>
-      <td>12000</td>
-      <td>60 months</td>
-      <td>9.80%</td>
-      <td>253.79</td>
+      <th>421094</th>
+      <td>20000</td>
+      <td>36 months</td>
+      <td>11.99%</td>
+      <td>664.20</td>
       <td>B</td>
-      <td>B3</td>
+      <td>B5</td>
       <td>10+ years</td>
-      <td>MORTGAGE</td>
-      <td>65000.0</td>
-      <td>Not Verified</td>
-      <td>Dec-2015</td>
+      <td>RENT</td>
+      <td>100000.0</td>
+      <td>Verified</td>
+      <td>Jan-2015</td>
       <td>Fully Paid</td>
-      <td>debt_consolidation</td>
-      <td>23.84</td>
-      <td>Nov-2003</td>
-      <td>18</td>
-      <td>9786</td>
-      <td>13.4%</td>
-      <td>37</td>
+      <td>credit_card</td>
+      <td>10.83</td>
+      <td>Dec-2001</td>
+      <td>8</td>
+      <td>33266</td>
+      <td>79.8%</td>
+      <td>10</td>
     </tr>
   </tbody>
 </table>
@@ -283,13 +283,13 @@ df.loan_status.value_counts()
 
 
 
-    Fully Paid            6958
-    Charged Off           1672
-    Current               1244
-    Late (31-120 days)      86
-    Late (16-30 days)       19
-    In Grace Period         17
-    Default                  1
+    Fully Paid            296634
+    Charged Off            74762
+    Current                46461
+    Late (31-120 days)      1819
+    In Grace Period          980
+    Late (16-30 days)        434
+    Default                    5
     Name: loan_status, dtype: int64
 
 
@@ -300,12 +300,12 @@ Target feature 'loan_status' has 7 factors. We will reduce it to two 'Good' and 
 ```python
 good_loans = ['Fully Paid', 'Current']
 
-def LoanCondition(status):
+def ChangeStatus(status):
     if status in good_loans:
         return 'Good Loan'
     else:
         return 'Bad Loan'
-tmp = df['loan_status'].apply(LoanCondition)
+tmp = df['loan_status'].apply(ChangeStatus)
 df.loan_status = tmp
 ```
 
@@ -492,6 +492,11 @@ df.head()
 
 
 ```python
+
+```
+
+
+```python
 #statistics of numeric features
 df.describe().iloc[[1,2,3,7],:].round(1)
 ```
@@ -534,32 +539,32 @@ df.describe().iloc[[1,2,3,7],:].round(1)
   <tbody>
     <tr>
       <th>mean</th>
-      <td>15116.9</td>
-      <td>43.1</td>
-      <td>12.3</td>
-      <td>441.5</td>
-      <td>5.7</td>
-      <td>78890.6</td>
-      <td>19.5</td>
-      <td>12.4</td>
-      <td>17582.2</td>
-      <td>51.0</td>
-      <td>26.0</td>
+      <td>15240.3</td>
+      <td>43.9</td>
+      <td>12.6</td>
+      <td>441.8</td>
+      <td>5.8</td>
+      <td>76965.6</td>
+      <td>19.1</td>
+      <td>11.9</td>
+      <td>17685.5</td>
+      <td>53.8</td>
+      <td>25.5</td>
       <td>16.8</td>
     </tr>
     <tr>
       <th>std</th>
-      <td>8720.0</td>
-      <td>10.9</td>
+      <td>8571.3</td>
+      <td>11.3</td>
       <td>4.3</td>
-      <td>251.0</td>
+      <td>244.8</td>
       <td>3.8</td>
-      <td>64417.8</td>
-      <td>13.1</td>
-      <td>5.9</td>
-      <td>22524.2</td>
-      <td>24.2</td>
-      <td>12.3</td>
+      <td>73950.0</td>
+      <td>8.9</td>
+      <td>5.6</td>
+      <td>24195.0</td>
+      <td>23.9</td>
+      <td>12.1</td>
       <td>7.6</td>
     </tr>
     <tr>
@@ -567,9 +572,9 @@ df.describe().iloc[[1,2,3,7],:].round(1)
       <td>1000.0</td>
       <td>36.0</td>
       <td>5.3</td>
-      <td>30.5</td>
+      <td>14.0</td>
       <td>0.0</td>
-      <td>1770.0</td>
+      <td>0.0</td>
       <td>0.0</td>
       <td>1.0</td>
       <td>0.0</td>
@@ -582,15 +587,15 @@ df.describe().iloc[[1,2,3,7],:].round(1)
       <td>35000.0</td>
       <td>60.0</td>
       <td>29.0</td>
-      <td>1354.7</td>
+      <td>1445.5</td>
       <td>10.0</td>
-      <td>3964280.0</td>
+      <td>9500000.0</td>
       <td>999.0</td>
-      <td>55.0</td>
-      <td>566420.0</td>
-      <td>134.3</td>
-      <td>105.0</td>
-      <td>59.0</td>
+      <td>90.0</td>
+      <td>2904836.0</td>
+      <td>193.0</td>
+      <td>169.0</td>
+      <td>71.0</td>
     </tr>
   </tbody>
 </table>
@@ -611,7 +616,7 @@ plotLoanStat1(df,colors = ColorList([11,12]))
 ```
 
 
-![png](output_21_0.png)
+![png](output_22_0.png)
 
 
 
@@ -635,18 +640,20 @@ df.purpose.value_counts()
 
 
 
-    debt_consolidation    5723
-    credit_card           2469
-    home_improvement       562
-    other                  552
-    major_purchase         214
-    medical                108
-    car                    103
-    small_business         102
-    vacation                65
-    moving                  52
-    house                   43
-    renewable_energy         4
+    debt_consolidation    250020
+    credit_card           102025
+    home_improvement       25293
+    other                  19204
+    major_purchase          7449
+    medical                 3938
+    car                     3466
+    small_business          3364
+    moving                  2420
+    vacation                2249
+    house                   1438
+    renewable_energy         224
+    wedding                    4
+    educational                1
     Name: purpose, dtype: int64
 
 
@@ -713,14 +720,13 @@ iplot(fig)
 
 
 
-<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="https://plot.ly/~truzmeto/47.embed" height="525px" width="100%"></iframe>
+<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="https://plot.ly/~truzmeto/49.embed" height="525px" width="100%"></iframe>
 
 
 
+**Load Static Image**
 
-```python
-
-```
+![title](./newplot1.png)
 
 
 ```python
@@ -744,7 +750,7 @@ CPlot(corr_mat = cor.values, axis_labs = corr_names,cmap = cmap,
 ```
 
 
-![png](output_31_0.png)
+![png](output_32_0.png)
 
 
 'loan_amnt' and 'installment' are highly correlated
@@ -756,11 +762,11 @@ Sort 'grade' and 'sub_grade' in alphabetic order and check how interest rate var
 
 ```python
 colors = ColorList([11,1])
-plotLoanStats2(df,colors)
+plotLoanStat2(df,colors)
 ```
 
 
-![png](output_34_0.png)
+![png](output_35_0.png)
 
 
 
@@ -777,7 +783,7 @@ plotLoanStat3(df)
 ```
 
 
-![png](output_37_0.png)
+![png](output_38_0.png)
 
 
 ### Bla Bla
@@ -868,14 +874,13 @@ iplot(fig)
 
 
 
-<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="https://plot.ly/~truzmeto/25.embed" height="525px" width="100%"></iframe>
+<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="https://plot.ly/~truzmeto/51.embed" height="525px" width="100%"></iframe>
 
 
 
+**Load static Image**
 
-```python
-
-```
+![title](./newplot2.png)
 
 
 ```python
