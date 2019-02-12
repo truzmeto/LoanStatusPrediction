@@ -19,7 +19,7 @@ def plotLoanStat1(df, colors):
     f, ax = plt.subplots(1,2, figsize=(16,6))
     fs = 12
     plt.suptitle('Information on Loan Status', fontsize=fs)
-    df["term"].value_counts().plot.pie(explode=[0,0.1],
+    df["loan_status"].value_counts().plot.pie(explode=[0,0.1],
                                        autopct='%1.2f%%',
                                        ax=ax[0],
                                        shadow=True,

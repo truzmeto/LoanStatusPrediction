@@ -1,8 +1,8 @@
 # Loan Status Prediction Project
 
-In this Data Science project, I aim to illustrate both analytical and
-practical aspects od data analysis, visualization and machine learning
-using python its most common libraries.
+In this project, I aim to illustrate both analytical and practical
+aspects of data science by performing data analysis, visualization
+and predictive modelling using python and its famous libraries.
 
 ## Requirements:
 
@@ -11,4 +11,4 @@ using python its most common libraries.
 * numpy1.13.3
 * sklearn0.19.1
 * seaborn0.9.0
-* plotly
+* plotly3.6.1
