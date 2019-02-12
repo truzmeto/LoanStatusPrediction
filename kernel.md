@@ -10,15 +10,10 @@ In this project, I performe data analysis and predictive modelling on Lending Cl
 
 Lending Club is one of the America's largest lending companies that allows borrowers
 to apply and obtain personal loans, auto refinancing, business loans, and elective medical procedures.
-Additionally, they make some of their data publically available.  
+Additionally, they make some of their data publically available https://www.lendingclub.com/info/download-data.action.  
 
 
 ![title](https://getbackonfeet.com/wp-content/uploads/2018/10/000-2-1.png)
-
-
-```python
-
-```
 
 ## ETL Pipline
 
@@ -26,15 +21,15 @@ Additionally, they make some of their data publically available.
 
     * Drop irrelevant features
     * Clean mixed type features
-    * ....
 
-2. **Exploratory Analysis**
-
+2. **Exploratory Data Analysis**
+    * Visualize different sets of features 
+    * Another round of cleaning and featurer extraction
+    
 
 3. **Machine Learning** 
     * Feature Normalization
     * Train Test Split
-    * Cross Validation
     * ML Prediction
     
 
@@ -53,16 +48,26 @@ import matplotlib.pyplot as plt
 from plotly.plotly import iplot
 import plotly.graph_objs as go
 
+#my functions
 from src.utility import *
 from src.plotting import *
 from src.ml_models import *
 
-%matplotlib inline  
+#import ml stuff
+from sklearn import preprocessing
+from sklearn.neural_network import MLPClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import confusion_matrix,classification_report
+
+#suppress warnings
 import warnings
 warnings.filterwarnings("ignore")
+%matplotlib inline  
 ```
 
-## Loan Data
+### Import Data
+
+We import data by subsetting columns that are most important. Raw data contains nearly 145 features. Some of these features are duplicates, some others are irrelevant( customer_id, ...). By eliminating unnecessary features we reduce memory usage and speed up performance. 
 
 
 ```python
@@ -70,6 +75,8 @@ keep_cols = ["loan_status","loan_amnt", "term","int_rate","installment","grade",
              "sub_grade","purpose","emp_length","home_ownership","annual_inc",
              "verification_status","issue_d","dti","earliest_cr_line","open_acc",
              "revol_bal","revol_util","total_acc"]
+
+#"zip_code","addr_state"
 
 df_orig = pd.read_csv("data/loan.csv", usecols=keep_cols,skipfooter=4,skiprows=1)#,low_memory=False)
 ```
@@ -106,9 +113,11 @@ df.info()
     memory usage: 61.0+ MB
 
 
+Only 19 features are choosen to process further. Feature names are self explanatory. Data info shows that some of the features have numeric or integer data type , while others are categorical data type(object). Let's take a closer look at a few rows.
+
 
 ```python
-df.tail()
+df.head()
 ```
 
 
@@ -155,114 +164,114 @@ df.tail()
   </thead>
   <tbody>
     <tr>
-      <th>421090</th>
-      <td>10000</td>
+      <th>0</th>
+      <td>24700</td>
       <td>36 months</td>
       <td>11.99%</td>
-      <td>332.10</td>
-      <td>B</td>
-      <td>B5</td>
-      <td>8 years</td>
-      <td>RENT</td>
-      <td>31000.0</td>
-      <td>Verified</td>
-      <td>Jan-2015</td>
-      <td>Fully Paid</td>
-      <td>debt_consolidation</td>
-      <td>28.69</td>
-      <td>Sep-2004</td>
-      <td>9</td>
-      <td>14037</td>
-      <td>82.1%</td>
-      <td>15</td>
-    </tr>
-    <tr>
-      <th>421091</th>
-      <td>24000</td>
-      <td>36 months</td>
-      <td>11.99%</td>
-      <td>797.03</td>
-      <td>B</td>
-      <td>B5</td>
+      <td>820.28</td>
+      <td>C</td>
+      <td>C1</td>
       <td>10+ years</td>
       <td>MORTGAGE</td>
-      <td>79000.0</td>
-      <td>Verified</td>
-      <td>Jan-2015</td>
+      <td>65000.0</td>
+      <td>Not Verified</td>
+      <td>Dec-2015</td>
       <td>Fully Paid</td>
-      <td>home_improvement</td>
-      <td>3.90</td>
-      <td>Mar-1974</td>
-      <td>5</td>
-      <td>8621</td>
-      <td>84.5%</td>
-      <td>23</td>
+      <td>small_business</td>
+      <td>16.06</td>
+      <td>Dec-1999</td>
+      <td>22</td>
+      <td>21470</td>
+      <td>19.2%</td>
+      <td>38</td>
     </tr>
     <tr>
-      <th>421092</th>
-      <td>12000</td>
+      <th>1</th>
+      <td>17925</td>
       <td>60 months</td>
-      <td>19.99%</td>
-      <td>317.86</td>
-      <td>E</td>
-      <td>E3</td>
-      <td>1 year</td>
-      <td>RENT</td>
-      <td>64400.0</td>
+      <td>17.27%</td>
+      <td>448.09</td>
+      <td>D</td>
+      <td>D3</td>
+      <td>10+ years</td>
+      <td>OWN</td>
+      <td>39000.0</td>
       <td>Source Verified</td>
-      <td>Jan-2015</td>
-      <td>Charged Off</td>
+      <td>Dec-2015</td>
+      <td>Current</td>
       <td>debt_consolidation</td>
-      <td>27.19</td>
-      <td>Oct-2003</td>
-      <td>17</td>
-      <td>8254</td>
-      <td>30.6%</td>
-      <td>20</td>
+      <td>27.78</td>
+      <td>Sep-2002</td>
+      <td>10</td>
+      <td>19614</td>
+      <td>76%</td>
+      <td>21</td>
     </tr>
     <tr>
-      <th>421093</th>
-      <td>13000</td>
+      <th>2</th>
+      <td>9000</td>
+      <td>36 months</td>
+      <td>8.49%</td>
+      <td>284.07</td>
+      <td>B</td>
+      <td>B1</td>
+      <td>8 years</td>
+      <td>MORTGAGE</td>
+      <td>47000.0</td>
+      <td>Not Verified</td>
+      <td>Dec-2015</td>
+      <td>Fully Paid</td>
+      <td>debt_consolidation</td>
+      <td>8.43</td>
+      <td>Nov-2000</td>
+      <td>12</td>
+      <td>9747</td>
+      <td>26.7%</td>
+      <td>22</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>11550</td>
       <td>60 months</td>
-      <td>15.99%</td>
-      <td>316.07</td>
+      <td>16.59%</td>
+      <td>284.51</td>
       <td>D</td>
       <td>D2</td>
       <td>5 years</td>
       <td>RENT</td>
-      <td>35000.0</td>
-      <td>Verified</td>
-      <td>Jan-2015</td>
+      <td>38000.0</td>
+      <td>Not Verified</td>
+      <td>Dec-2015</td>
       <td>Charged Off</td>
-      <td>debt_consolidation</td>
-      <td>30.90</td>
-      <td>Sep-2003</td>
+      <td>credit_card</td>
+      <td>21.07</td>
+      <td>Jan-2011</td>
       <td>9</td>
-      <td>11031</td>
-      <td>61.3%</td>
-      <td>22</td>
+      <td>7179</td>
+      <td>39.7%</td>
+      <td>12</td>
     </tr>
     <tr>
-      <th>421094</th>
-      <td>20000</td>
-      <td>36 months</td>
-      <td>11.99%</td>
-      <td>664.20</td>
+      <th>4</th>
+      <td>12000</td>
+      <td>60 months</td>
+      <td>9.80%</td>
+      <td>253.79</td>
       <td>B</td>
-      <td>B5</td>
+      <td>B3</td>
       <td>10+ years</td>
-      <td>RENT</td>
-      <td>100000.0</td>
-      <td>Verified</td>
-      <td>Jan-2015</td>
+      <td>MORTGAGE</td>
+      <td>65000.0</td>
+      <td>Not Verified</td>
+      <td>Dec-2015</td>
       <td>Fully Paid</td>
-      <td>credit_card</td>
-      <td>10.83</td>
-      <td>Dec-2001</td>
-      <td>8</td>
-      <td>33266</td>
-      <td>79.8%</td>
-      <td>10</td>
+      <td>debt_consolidation</td>
+      <td>23.84</td>
+      <td>Nov-2003</td>
+      <td>18</td>
+      <td>9786</td>
+      <td>13.4%</td>
+      <td>37</td>
     </tr>
   </tbody>
 </table>
@@ -270,53 +279,8 @@ df.tail()
 
 
 
-There were overall 145 features and most of them were irrelevant. So we keep most important features for further processing that reduces memory usage and improves performance.
-
-### Fix Target Feature
-
-
-```python
-# simplify target feature
-df.loan_status.value_counts()
-```
-
-
-
-
-    Fully Paid            296634
-    Charged Off            74762
-    Current                46461
-    Late (31-120 days)      1819
-    In Grace Period          980
-    Late (16-30 days)        434
-    Default                    5
-    Name: loan_status, dtype: int64
-
-
-
-Target feature 'loan_status' has 7 factors. We will reduce it to two 'Good' and 'Bad' loans.
-
-
-```python
-good_loans = ['Fully Paid', 'Current']
-
-def ChangeStatus(status):
-    if status in good_loans:
-        return 'Good Loan'
-    else:
-        return 'Bad Loan'
-tmp = df['loan_status'].apply(ChangeStatus)
-df.loan_status = tmp
-```
-
-
-```python
-
-```
-
-### Clean Features
-
-Some features have mixed type such as number mixed with string.
+As shown, some features have mixed type such as number mixed with string that needs cleaning. In addition,
+date_time features can be used to extract a new feature. For instance, by subtracting 'earliest credit line' from 'issue date' we obtain 'credit age' that might have more impact on prediction.
 
 * Remove '%' from 'int_rate', 'revol_util' 
 * Replace all 'n/a' with np.nan
@@ -324,6 +288,10 @@ Some features have mixed type such as number mixed with string.
 * Save name of the loan issued month
 * Get credita agae from issue data and earliest credit line
 * Again drop some unnecessary columns
+
+###  Feature Cleaning
+
+Here, I call a function that performs data cleaning that is located in 'src/utility.py' file.
 
 
 ```python
@@ -377,7 +345,7 @@ df.head()
     <tr>
       <th>0</th>
       <td>24700</td>
-      <td>36</td>
+      <td>36 months</td>
       <td>11.99</td>
       <td>820.28</td>
       <td>C</td>
@@ -386,7 +354,7 @@ df.head()
       <td>MORTGAGE</td>
       <td>65000.0</td>
       <td>Not Verified</td>
-      <td>Good Loan</td>
+      <td>Fully Paid</td>
       <td>small_business</td>
       <td>16.06</td>
       <td>22</td>
@@ -399,7 +367,7 @@ df.head()
     <tr>
       <th>1</th>
       <td>17925</td>
-      <td>60</td>
+      <td>60 months</td>
       <td>17.27</td>
       <td>448.09</td>
       <td>D</td>
@@ -408,7 +376,7 @@ df.head()
       <td>OWN</td>
       <td>39000.0</td>
       <td>Source Verified</td>
-      <td>Good Loan</td>
+      <td>Current</td>
       <td>debt_consolidation</td>
       <td>27.78</td>
       <td>10</td>
@@ -421,7 +389,7 @@ df.head()
     <tr>
       <th>2</th>
       <td>9000</td>
-      <td>36</td>
+      <td>36 months</td>
       <td>8.49</td>
       <td>284.07</td>
       <td>B</td>
@@ -430,7 +398,7 @@ df.head()
       <td>MORTGAGE</td>
       <td>47000.0</td>
       <td>Not Verified</td>
-      <td>Good Loan</td>
+      <td>Fully Paid</td>
       <td>debt_consolidation</td>
       <td>8.43</td>
       <td>12</td>
@@ -443,7 +411,7 @@ df.head()
     <tr>
       <th>3</th>
       <td>11550</td>
-      <td>60</td>
+      <td>60 months</td>
       <td>16.59</td>
       <td>284.51</td>
       <td>D</td>
@@ -452,7 +420,7 @@ df.head()
       <td>RENT</td>
       <td>38000.0</td>
       <td>Not Verified</td>
-      <td>Bad Loan</td>
+      <td>Charged Off</td>
       <td>credit_card</td>
       <td>21.07</td>
       <td>9</td>
@@ -465,7 +433,7 @@ df.head()
     <tr>
       <th>4</th>
       <td>12000</td>
-      <td>60</td>
+      <td>60 months</td>
       <td>9.80</td>
       <td>253.79</td>
       <td>B</td>
@@ -474,7 +442,7 @@ df.head()
       <td>MORTGAGE</td>
       <td>65000.0</td>
       <td>Not Verified</td>
-      <td>Good Loan</td>
+      <td>Fully Paid</td>
       <td>debt_consolidation</td>
       <td>23.84</td>
       <td>18</td>
@@ -490,10 +458,76 @@ df.head()
 
 
 
+Cleaning function did the job by extracting numeric part from mixed data types. Also, we have a new feature that is 'credit age' measured in years. Next we point attantion to a target feature.
+
+### The Target Feature : Loan Status
+
 
 ```python
-
+# simplify target feature
+df.loan_status.value_counts()
 ```
+
+
+
+
+    Fully Paid            296634
+    Charged Off            74762
+    Current                46461
+    Late (31-120 days)      1819
+    In Grace Period          980
+    Late (16-30 days)        434
+    Default                    5
+    Name: loan_status, dtype: int64
+
+
+
+Target feature 'loan_status' is composed of 7 factors. For simplicity, we reduce it down to two 'Good' and 'Bad' loans. We consider 'Fully Paid' and 'Current' as good loans, while the rest as bad loans. Here, I make a new function to implement above transformation.
+
+
+```python
+good_loans = ['Fully Paid', 'Current']
+
+def ChangeStatus(status):
+    if status in good_loans:
+        return 'Good Loan'
+    else:
+        return 'Bad Loan'
+tmp = df['loan_status'].apply(ChangeStatus)
+df.loan_status = tmp
+```
+
+
+```python
+df.loan_status.value_counts()
+```
+
+
+
+
+    Good Loan    343095
+    Bad Loan      78000
+    Name: loan_status, dtype: int64
+
+
+
+
+
+
+```python
+plotLoanStat1(df,colors = ColorList([11,12]))
+```
+
+
+![png](output_20_0.png)
+
+
+* Based on fraction of 'Good' and 'Bad' loans, we do have data imbalance problem(20%-80%).
+* Percentage of issued loans seem to reduce as year ending!
+
+### Feature Statistics
+
+It is always important to check for extreme cases. For instance, checking min and max values of features might help spot outliers. Pandas have a convinient function 'describe' to fullfill this task.
 
 
 ```python
@@ -523,7 +557,6 @@ df.describe().iloc[[1,2,3,7],:].round(1)
     <tr style="text-align: right;">
       <th></th>
       <th>loan_amnt</th>
-      <th>term</th>
       <th>int_rate</th>
       <th>installment</th>
       <th>emp_length</th>
@@ -540,7 +573,6 @@ df.describe().iloc[[1,2,3,7],:].round(1)
     <tr>
       <th>mean</th>
       <td>15240.3</td>
-      <td>43.9</td>
       <td>12.6</td>
       <td>441.8</td>
       <td>5.8</td>
@@ -555,7 +587,6 @@ df.describe().iloc[[1,2,3,7],:].round(1)
     <tr>
       <th>std</th>
       <td>8571.3</td>
-      <td>11.3</td>
       <td>4.3</td>
       <td>244.8</td>
       <td>3.8</td>
@@ -570,7 +601,6 @@ df.describe().iloc[[1,2,3,7],:].round(1)
     <tr>
       <th>min</th>
       <td>1000.0</td>
-      <td>36.0</td>
       <td>5.3</td>
       <td>14.0</td>
       <td>0.0</td>
@@ -585,7 +615,6 @@ df.describe().iloc[[1,2,3,7],:].round(1)
     <tr>
       <th>max</th>
       <td>35000.0</td>
-      <td>60.0</td>
       <td>29.0</td>
       <td>1445.5</td>
       <td>10.0</td>
@@ -603,34 +632,96 @@ df.describe().iloc[[1,2,3,7],:].round(1)
 
 
 
-
-```python
-
-```
-
-### Loan Status & Amount
+* Max loan amount is 35K, while min loan amount is as low as 1000 dollars. 
+* Credit term is either 36 or 60 month, so it is better to keep it as categorical feature.
+* Interest rate range seems reasonable (5% - 29%), installments and employement length look fine 
+* Max annual income looks too high, let's take closer look!
 
 
 ```python
-plotLoanStat1(df,colors = ColorList([11,12]))
+df[df.annual_inc == 9500000]
 ```
 
 
-![png](output_22_0.png)
 
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>loan_amnt</th>
+      <th>term</th>
+      <th>int_rate</th>
+      <th>installment</th>
+      <th>grade</th>
+      <th>sub_grade</th>
+      <th>emp_length</th>
+      <th>home_ownership</th>
+      <th>annual_inc</th>
+      <th>verification_status</th>
+      <th>loan_status</th>
+      <th>purpose</th>
+      <th>dti</th>
+      <th>open_acc</th>
+      <th>revol_bal</th>
+      <th>revol_util</th>
+      <th>total_acc</th>
+      <th>issue_month</th>
+      <th>cred_age</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>231029</th>
+      <td>24000</td>
+      <td>60 months</td>
+      <td>7.89</td>
+      <td>485.38</td>
+      <td>A</td>
+      <td>A5</td>
+      <td>10</td>
+      <td>MORTGAGE</td>
+      <td>9500000.0</td>
+      <td>Source Verified</td>
+      <td>Bad Loan</td>
+      <td>credit_card</td>
+      <td>0.12</td>
+      <td>12</td>
+      <td>16854</td>
+      <td>22.0</td>
+      <td>31</td>
+      <td>Jul</td>
+      <td>33.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+This is indeed interesting case, where customer's loan status was marked as bad with almost 1000K annual income, excellent credit history, and he wanted 24K for 60 month term. Probably, he forgot to make payment on time. This is way higher than national average, and can be considered an outlier.  
 
 
 ```python
-
+#drop_indx = df[df.annual_inc == 9500000].index[0]
+#df.drop(drop_indx, inplace=True) # keep it
 ```
 
-* Based on fraction of 'Good' and 'Bad' loans, we don't have data imbalance problem.
-* Percentage of issued loans seem to reduce as year ending!
-
-
-```python
-
-```
+### Loan Purpose
 
 
 ```python
@@ -658,10 +749,7 @@ df.purpose.value_counts()
 
 
 
-
-```python
-
-```
+Loan is given for variety of different purposes as listed above. Most common cases are debt consolidation, credit card, and home improvement. Now, let's take a look at how amount of loan varies among different loan purposes by loan status using beautiful figure tailored with 'plotly'.
 
 
 ```python
@@ -681,7 +769,6 @@ good_bars = go.Bar(
         )
     )
 )
-
 
 bad_bars = go.Bar(
     x = list(ave_bad_loan_by_purpose.index),
@@ -720,44 +807,58 @@ iplot(fig)
 
 
 
-<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="https://plot.ly/~truzmeto/49.embed" height="525px" width="100%"></iframe>
+<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="https://plot.ly/~truzmeto/93.embed" height="525px" width="100%"></iframe>
 
 
+
+Plotly images may not be visible in a github repo. Thus, I also attached locally saved static image.
 
 **Load Static Image**
 
 ![title](./newplot1.png)
+
+For most of the loan purposes, red bars are slightly taller than the green. Onle money lended for educational or wedding purposes stayed completely clean, meaning no missed payments, no charged offs etc. This suggests that 'loan purpose' feature may be a good candidate for our binary classification problem since it is able to catch some difference between good and bad loans. 
+
+### Feature Correlations
+
+Correlations between features helps to eliminate collinearity problem. Highly correlated features tend to
+negativaly affect the prediction performance by introducing bias towards that specific feature. Thus, in practice, among highy correlated features we keep one, and remove the rest. Here, I use function built on top of matplotlib
+located at 'src/plotting.py' to illustrate feature correlation.
 
 
 ```python
 
 ```
 
-### Let's  look at how features are correlated
-
 
 ```python
 cor = df.corr()
-corr_names = ['Loan Amount', 'Term', 'Interest Rate', 'Installment', 'Employement Length',
+corr_names = ['Loan Amount', 'Interest Rate', 'Installment', 'Employement Length',
               'Annual Income', 'Debt to Credit Ratio', 'Open Accounts', 'Revolving Balance',
               'Revolving Utility', 'Total Accounts','Credit Age']
 
 cmap = "YlGnBu"
 plt.figure(figsize=(9,6))
 CPlot(corr_mat = cor.values, axis_labs = corr_names,cmap = cmap,
-      pad = 0.05,rad = 380, xlab = '',ylab = '',fs = 13,
+      pad = 0.05,rad = 41*len(cor), xlab = '',ylab = '',fs = 13,
       xtick_lab_rot = 70)
 ```
 
 
-![png](output_32_0.png)
+![png](output_37_0.png)
 
 
-'loan_amnt' and 'installment' are highly correlated
+'loan_amnt' and 'installment' are highly correlated. Therefore, we can drop the 'installments'.
+
+
+```python
+df.drop(columns="installment",inplace = True)
+```
 
 ## Interest Rate
 
-Sort 'grade' and 'sub_grade' in alphabetic order and check how interest rate varies across different grades.
+Interest rate is another interesting aspect of loan to look at. Here, I sort 'grade' and 'sub_grade'
+in alphabetic order and check how interest rate varies across different grades. 
 
 
 ```python
@@ -766,16 +867,15 @@ plotLoanStat2(df,colors)
 ```
 
 
-![png](output_35_0.png)
+![png](output_41_0.png)
 
 
+* Interest rates show a good correlation with loan grade. More interest applied as grade goes down from A to G
+* In some cases, loan status marked as 'bad' show slightly higher inerest rate, but negligable. 
+* Again, this feature may not be a good predictor of loan status!
 
-```python
 
-
-```
-
-sdfsdfffffffffffff
+Next, we consider variation of interest rate in time across different home ownership types by calling 'plotLoanStat3' function. (src/plotting.py)
 
 
 ```python
@@ -783,31 +883,123 @@ plotLoanStat3(df)
 ```
 
 
-![png](output_38_0.png)
+![png](output_44_0.png)
 
 
-### Bla Bla
+* Home ownership type "ANY" did not show up
+* Home renters seem to pay more interest on loans compared to other cases
 
 
 ```python
+df.home_ownership.value_counts()
+```
 
+
+
+
+    MORTGAGE    207683
+    RENT        167644
+    OWN          45766
+    ANY              2
+    Name: home_ownership, dtype: int64
+
+
+
+There are only 2 cases for "ANY", that we will replace with "OWN" to reduce memory usage later for dummy encoding.
+
+
+```python
+ df['home_ownership'] = df['home_ownership'].replace(['ANY'], 'OWN')
 ```
 
 
 ```python
+df.home_ownership.value_counts()
+```
 
+
+
+
+    MORTGAGE    207683
+    RENT        167644
+    OWN          45768
+    Name: home_ownership, dtype: int64
+
+
+
+### Loan Amount by Income Class
+
+First, I make a function in order to partition income into different classes.
+
+
+```python
+def partition_income(income):
+    #np.empty(len(income))
+    clas = []
+    for val in range(len(income)):
+        if val <= 20000:
+            clas.append("lowB")
+        elif (val > 20000) and (val <= 35000):
+            clas.append("lowA")
+        elif (val > 35000) and (val <= 50000):
+            clas.append("midB")
+        elif (val > 50000) and (val <= 70000):
+            clas.append("midA")
+        elif (val > 70000) and (val <= 100000):
+            clas.append("upperB")
+        elif (val > 100000) and (val <= 250000):
+            clas.append("upperA")
+        else:            
+            clas.append("Rich")
+            
+    return clas
+        
 ```
 
 
 ```python
-ave_good_loan_by_grade = df[df.loan_status == 'Good Loan'].groupby('grade',axis=0).loan_amnt.mean().astype(int)
-ave_bad_loan_by_grade = df[df.loan_status == 'Bad Loan'].groupby('grade',axis=0).loan_amnt.mean().astype(int)
+classes = partition_income(df.annual_inc.values)
+```
+
+Then, I add this new feature into our data frame.
+
+
+```python
+df['inc_class'] = pd.Series( classes, index=df.index)     
+```
+
+
+```python
+df.inc_class.value_counts()
+```
+
+
+
+
+    Rich      171094
+    upperA    150000
+    upperB     30000
+    lowB       20001
+    midA       20000
+    lowA       15000
+    midB       15000
+    Name: inc_class, dtype: int64
+
+
+
+Wow! This data set seem to contain mostly rich people based on their over 250K annual income.
+Let's visualize it with plotly!
+
+
+```python
+ave_good_loan_by_class = df[df.loan_status == 'Good Loan'].groupby('inc_class',axis=0).loan_amnt.sum().astype(int)
+ave_bad_loan_by_class = df[df.loan_status == 'Bad Loan'].groupby('inc_class',axis=0).loan_amnt.sum().astype(int)
 
 #prepare data for plotly
 data = [
     go.Scatterpolar(mode='lines+markers',
-        r = list(ave_good_loan_by_grade.values),
-        theta = list(ave_good_loan_by_grade.index),
+        r = list(ave_good_loan_by_class.values),
+        theta = list(ave_good_loan_by_class.index),
         fill = 'toself',
         name = 'Good Loans',
         line = dict(color = "#63AF63"),
@@ -816,8 +1008,8 @@ data = [
 
     go.Scatterpolar(
         mode='lines+markers',
-        r = list(ave_bad_loan_by_grade.values),
-        theta = list(ave_bad_loan_by_grade.index),
+        r = list(ave_bad_loan_by_class.values),
+        theta = list(ave_bad_loan_by_class.index),
         fill = 'toself', name = 'Bad Loans',
         line = dict(color = "#C31414"),
         marker = dict(color = "#FF5050",symbol = "square",size = 11),
@@ -826,7 +1018,7 @@ data = [
 
 #define layout
 layout = go.Layout(
-    title="Average Good and Bad Loans by Grade",
+    title="Total Good and Bad Loans by Income Class",
     showlegend = False,
     paper_bgcolor = "rgb(255, 248, 243)",
     polar1 = dict(
@@ -874,13 +1066,264 @@ iplot(fig)
 
 
 
-<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="https://plot.ly/~truzmeto/51.embed" height="525px" width="100%"></iframe>
+<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="https://plot.ly/~truzmeto/95.embed" height="525px" width="100%"></iframe>
 
 
 
-**Load static Image**
+**Loading static Image**
+
+![title](./newplot3.png)
+
+* Looks like most of the net loan money is consumed by 'Rich' and 'UpperA' class, not surprisingly amout given to other classes is marginal.
+* Total loan amout given to upperA and rich class approximates 2 billion for good loans, while it is close to 500 million for bad loans. 
+
+
+```python
+
+```
+
+
+```python
+ave_good_loan_by_grade = df[df.loan_status == 'Good Loan'].groupby('grade',axis=0).cred_age.max().astype(int)
+ave_bad_loan_by_grade = df[df.loan_status == 'Bad Loan'].groupby('grade',axis=0).cred_age.max().astype(int)
+
+#prepare data for plotly
+data = [
+    go.Scatterpolar(mode='lines+markers',
+        r = list(ave_good_loan_by_grade.values),
+        theta = list(ave_good_loan_by_grade.index),
+        fill = 'toself',
+        name = 'Good Loans',
+        line = dict(color = "#63AF63"),
+        marker = dict(color = "#B3FFB3",symbol = "square",size = 11),
+        subplot = "polar1"),
+
+    go.Scatterpolar(
+        mode='lines+markers',
+        r = list(ave_bad_loan_by_grade.values),
+        theta = list(ave_bad_loan_by_grade.index),
+        fill = 'toself', name = 'Bad Loans',
+        line = dict(color = "#C31414"),
+        marker = dict(color = "#FF5050",symbol = "square",size = 11),
+        subplot = "polar2")
+]
+
+#define layout
+layout = go.Layout(
+    title="Max Credit Age for Good and Bad Loans by Grade",
+    showlegend = False,
+    paper_bgcolor = "rgb(255, 248, 243)",
+    polar1 = dict(
+        domain = dict(
+        x = [0,0.4],
+        y = [0,1]
+      ),
+      radialaxis = dict(
+        tickfont = dict(
+          size = 12
+        )
+      ),
+      angularaxis = dict(
+        tickfont = dict(
+          size = 12
+        ),
+        rotation = 90,
+        direction = "counterclockwise"
+      )
+    ),
+    polar2 = dict(
+      domain = dict(
+        x = [0.6,1],
+        y = [0,1]
+      ),
+      radialaxis = dict(
+        tickfont = dict(
+          size = 12
+        )
+      ),
+      angularaxis = dict(
+        tickfont = dict(
+          size = 12
+        ),
+        rotation = 90,
+        direction = "clockwise"
+      ),
+    )
+)
+
+fig = go.Figure(data=data, layout=layout)
+iplot(fig)
+```
+
+
+
+
+<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="https://plot.ly/~truzmeto/97.embed" height="525px" width="100%"></iframe>
+
+
+
+**Loading static Image**
 
 ![title](./newplot2.png)
+
+
+
+This finalizes or data analysis. Now, we shift the attention to Machine Learning.
+
+## Machine Learning
+
+### Feature Normalization
+
+
+```python
+#drop issue_month
+df.drop(columns="issue_month",inplace = True)
+```
+
+
+```python
+#split numeric from categorical features
+df_cat = df[['term','grade','sub_grade','home_ownership',
+             'verification_status', 'loan_status','purpose', 'inc_class']]
+
+df_num = df[['loan_amnt', 'int_rate', 'emp_length','annual_inc','dti', 'open_acc',
+           'revol_bal', 'revol_util', 'total_acc','cred_age']]
+
+# min max normalize numeric features
+Min_Max_Scaler = preprocessing.MinMaxScaler()
+df_norm = pd.DataFrame(Min_Max_Scaler.fit_transform(df_num.values))
+
+#retrive colnames of normed df
+df_norm.columns = list(df_num.columns)
+
+#join normed feateres with categorical features
+df = pd.concat([df_cat, df_norm], axis=1)
+
+#join normed feateres with categorical features
+df = pd.concat([df_cat, df_norm], axis=1)
+
+df.fillna(0.0,inplace=True)
+df.fillna(0,inplace=True)
+
+```
+
+### Simple trick to avoid data imbalance
+
+Double or triple amount of underrepresented class and shuffle. When random forest classifier is used
+it performs resampling anyways. 
+
+
+```python
+from sklearn.utils import shuffle
+df_bad = df[df.loan_status == 'Bad Loan']
+df = pd.concat([df,df_bad])
+df = shuffle(df)
+df = pd.concat([df,df_bad])
+df = shuffle(df)
+```
+
+### Split target label from data & performe dummy encoding
+
+
+```python
+#split target labels from data
+labels = df['loan_status']#.values
+data = df.drop('loan_status',axis=1)#.values
+
+#performe one-hot-encoding on categorical features
+data = pd.get_dummies(data)
+```
+
+
+```python
+data.shape
+```
+
+
+
+
+    (577095, 81)
+
+
+
+### Train Test Split & Apply ML
+
+
+```python
+#train test split
+x_train, x_test, y_train, y_test = train_test_split(data, labels, test_size=0.30, random_state=10)
+```
+
+
+```python
+from sklearn.ensemble import RandomForestClassifier
+rf = RandomForestClassifier(n_estimators=500,
+                            max_depth=2,
+                            random_state=10,
+                            n_jobs=-1)
+
+rf.fit(x_train, y_train)
+```
+
+
+
+
+    RandomForestClassifier(bootstrap=True, class_weight=None, criterion='gini',
+                max_depth=2, max_features='auto', max_leaf_nodes=None,
+                min_impurity_decrease=0.0, min_impurity_split=None,
+                min_samples_leaf=1, min_samples_split=2,
+                min_weight_fraction_leaf=0.0, n_estimators=400, n_jobs=-1,
+                oob_score=False, random_state=10, verbose=0, warm_start=False)
+
+
+
+
+```python
+pred_test_rf = rf.predict(x_test)
+```
+
+
+```python
+print(confusion_matrix(y_test,pred_test_rf))
+print(classification_report(y_test,pred_test_rf))
+```
+
+    [[ 9738 60622]
+     [ 4487 98282]]
+                  precision    recall  f1-score   support
+    
+        Bad Loan       0.68      0.14      0.23     70360
+       Good Loan       0.62      0.96      0.75    102769
+    
+       micro avg       0.62      0.62      0.62    173129
+       macro avg       0.65      0.55      0.49    173129
+    weighted avg       0.65      0.62      0.54    173129
+    
+
+
+### Plot Feature Importance
+
+
+```python
+plt.figure(figsize = (11,12))
+fs = 14
+n_feat = 25
+feat_importances = pd.Series(rf.feature_importances_, index = x_train.columns)
+feat_importances.nlargest(n_feat).plot(kind='barh', fontsize=14)
+plt.title("Most Important Features", fontsize=fs+2)
+plt.xlabel("Feature Importance", fontsize=fs)
+```
+
+
+
+
+    Text(0.5, 0, 'Feature Importance')
+
+
+
+
+![png](output_80_1.png)
+
 
 
 ```python

@@ -20,7 +20,7 @@ def CleanData(df):
     issue_month = df.issue_d.str.replace('-2015', '')
     df['issue_month'] = pd.Series( issue_month, index=df.index)
     
-    df.term = pd.Series(df.term).str.replace('months', '').astype(int)
+    #df.term = pd.Series(df.term).str.replace('months', '').astype(int)
     
     df.earliest_cr_line = pd.to_datetime(df.earliest_cr_line)
     df.issue_d = pd.to_datetime(df.issue_d)
