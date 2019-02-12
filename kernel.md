@@ -1,10 +1,11 @@
 
 # Loan Status Prediction
 
+
 ## Introduction
 
 
-In this project, I performe data analysis and predictive modelling on Lending Club's loan data set for the year 2015 in order to understand how different set of features help to indentify customer loan status. This can potentially  
+In this project, I perform data analysis and predictive modelling on Lending Club's loan dataset for the year 2015 in order to understand how different set of features help to indentify customer loan status.   
 
 ## Lending Club Data
 
@@ -49,8 +50,10 @@ from plotly.plotly import iplot
 import plotly.graph_objs as go
 
 #my functions
-from src.utility import *
-from src.plotting import *
+#this functions relocated in order to make
+#the report look less bulcky
+from src.utility import CleanData, ColorList
+from src.plotting import CPlot,plotLoanStat1, plotLoanStat2, plotLoanStat3
 from src.ml_models import *
 
 #import ml stuff
@@ -67,7 +70,8 @@ warnings.filterwarnings("ignore")
 
 ### Import Data
 
-We import data by subsetting columns that are most important. Raw data contains nearly 145 features. Some of these features are duplicates, some others are irrelevant( customer_id, ...). By eliminating unnecessary features we reduce memory usage and speed up performance. 
+We import data by subsetting columns that are relevant and useful in data exploration. Raw data contains nearly 145 features. Some of these features are duplicates, some others are irrelevant( such as id,member_id,url etc.). By eliminating unnecessary features we reduce memory usage and speed up performance. 
+
 
 
 ```python
@@ -75,9 +79,7 @@ keep_cols = ["loan_status","loan_amnt", "term","int_rate","installment","grade",
              "sub_grade","purpose","emp_length","home_ownership","annual_inc",
              "verification_status","issue_d","dti","earliest_cr_line","open_acc",
              "revol_bal","revol_util","total_acc"]
-
 #"zip_code","addr_state"
-
 df_orig = pd.read_csv("data/loan.csv", usecols=keep_cols,skipfooter=4,skiprows=1)#,low_memory=False)
 ```
 
@@ -113,7 +115,7 @@ df.info()
     memory usage: 61.0+ MB
 
 
-Only 19 features are choosen to process further. Feature names are self explanatory. Data info shows that some of the features have numeric or integer data type , while others are categorical data type(object). Let's take a closer look at a few rows.
+Only 19 features are choosen to process further. Feature names are self explanatory. Data info show some numeric or integer data types and some categorical data types(object). Let's take a closer look at a few rows.
 
 
 ```python
@@ -279,8 +281,8 @@ df.head()
 
 
 
-As shown, some features have mixed type such as number mixed with string that needs cleaning. In addition,
-date_time features can be used to extract a new feature. For instance, by subtracting 'earliest credit line' from 'issue date' we obtain 'credit age' that might have more impact on prediction.
+As shown, some features have mixed data type such as number mixed with string that needs cleaning. In addition,
+date_time features can be used to extract a new more meaningfull feature. For instance, by subtracting 'earliest credit line' from 'issue date' we obtain 'credit age' that might have more impact on prediction.
 
 * Remove '%' from 'int_rate', 'revol_util' 
 * Replace all 'n/a' with np.nan
@@ -291,7 +293,8 @@ date_time features can be used to extract a new feature. For instance, by subtra
 
 ###  Feature Cleaning
 
-Here, I call a function that performs data cleaning that is located in 'src/utility.py' file.
+Here, I call a function that performs data cleaning that is located in 'src/utility.py' file. 
+
 
 
 ```python
@@ -482,7 +485,7 @@ df.loan_status.value_counts()
 
 
 
-Target feature 'loan_status' is composed of 7 factors. For simplicity, we reduce it down to two 'Good' and 'Bad' loans. We consider 'Fully Paid' and 'Current' as good loans, while the rest as bad loans. Here, I make a new function to implement above transformation.
+Target feature 'loan_status' is composed of 7 factors. For simplicity, we reduce it down to two 'Good' and 'Bad' loans. We consider 'Fully Paid' and 'Current' as good loans, while the rest as bad loans. Here, I make a new function to achieve above transformation.
 
 
 ```python
@@ -512,6 +515,14 @@ df.loan_status.value_counts()
 
 
 
+```python
+print('Good Loans Fraction =',round(df.loan_status.value_counts()[0]/df.shape[0],2))
+print('Bad Loans Fraction =',round(df.loan_status.value_counts()[1]/df.shape[0],2))
+```
+
+    Good Loans Fraction = 0.81
+    Bad Loans Fraction = 0.19
+
 
 
 ```python
@@ -522,8 +533,8 @@ plotLoanStat1(df,colors = ColorList([11,12]))
 ![png](output_20_0.png)
 
 
-* Based on fraction of 'Good' and 'Bad' loans, we do have data imbalance problem(20%-80%).
-* Percentage of issued loans seem to reduce as year ending!
+* Based on fraction of 'Good' and 'Bad' loans, we do have data imbalance problem that must be addressed before applying predictive modelling.
+* Percentage of issued loans seem to increase slightly as time passes. Percentage of Good Loans granted every month is nearly 4 times more than Bad Loans.
 
 ### Feature Statistics
 
@@ -807,7 +818,7 @@ iplot(fig)
 
 
 
-<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="https://plot.ly/~truzmeto/93.embed" height="525px" width="100%"></iframe>
+<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="https://plot.ly/~truzmeto/101.embed" height="525px" width="100%"></iframe>
 
 
 
@@ -817,18 +828,13 @@ Plotly images may not be visible in a github repo. Thus, I also attached locally
 
 ![title](./newplot1.png)
 
-For most of the loan purposes, red bars are slightly taller than the green. Onle money lended for educational or wedding purposes stayed completely clean, meaning no missed payments, no charged offs etc. This suggests that 'loan purpose' feature may be a good candidate for our binary classification problem since it is able to catch some difference between good and bad loans. 
+For most of the loan purposes, red bars are slightly taller than the green. Only money lended for educational or wedding purposes stayed completely clean, meaning no missed payments, no charged offs etc. This suggests that 'loan purpose' feature may be a good candidate for our binary classification problem since it is able to catch some difference between good and bad loans. 
 
 ### Feature Correlations
 
-Correlations between features helps to eliminate collinearity problem. Highly correlated features tend to
+Correlations between features helps to solve collinearity problem. Highly correlated features tend to
 negativaly affect the prediction performance by introducing bias towards that specific feature. Thus, in practice, among highy correlated features we keep one, and remove the rest. Here, I use function built on top of matplotlib
-located at 'src/plotting.py' to illustrate feature correlation.
-
-
-```python
-
-```
+('src/plotting.py') to illustrate feature correlation.
 
 
 ```python
@@ -838,14 +844,14 @@ corr_names = ['Loan Amount', 'Interest Rate', 'Installment', 'Employement Length
               'Revolving Utility', 'Total Accounts','Credit Age']
 
 cmap = "YlGnBu"
-plt.figure(figsize=(9,6))
+plt.figure(figsize=(9,7))
 CPlot(corr_mat = cor.values, axis_labs = corr_names,cmap = cmap,
       pad = 0.05,rad = 41*len(cor), xlab = '',ylab = '',fs = 13,
       xtick_lab_rot = 70)
 ```
 
 
-![png](output_37_0.png)
+![png](output_36_0.png)
 
 
 'loan_amnt' and 'installment' are highly correlated. Therefore, we can drop the 'installments'.
@@ -867,7 +873,7 @@ plotLoanStat2(df,colors)
 ```
 
 
-![png](output_41_0.png)
+![png](output_40_0.png)
 
 
 * Interest rates show a good correlation with loan grade. More interest applied as grade goes down from A to G
@@ -883,7 +889,7 @@ plotLoanStat3(df)
 ```
 
 
-![png](output_44_0.png)
+![png](output_43_0.png)
 
 
 * Home ownership type "ANY" did not show up
@@ -988,7 +994,35 @@ df.inc_class.value_counts()
 
 
 Wow! This data set seem to contain mostly rich people based on their over 250K annual income.
-Let's visualize it with plotly!
+Let's visualize it!
+
+
+```python
+fig, ax = plt.subplots(1,2, figsize=(14,5))
+
+loan_rich = df[df.inc_class == 'Rich'].loan_amnt.values
+loan_lowB = df[df.inc_class == 'lowB'].loan_amnt.values
+
+sns.distplot(loan_rich, ax=ax[0], color="#F7522F")
+ax[0].set_title("Distribution of loan given to Rich", fontsize=14)
+
+sns.distplot(loan_lowB, ax=ax[1], color="#2F8FF7")
+ax[1].set_title("Distribution of loan given to lowB class", fontsize=14)
+
+```
+
+
+
+
+    Text(0.5, 1.0, 'Distribution of loan given to lowB class')
+
+
+
+
+![png](output_56_1.png)
+
+
+
 
 
 ```python
@@ -1066,7 +1100,7 @@ iplot(fig)
 
 
 
-<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="https://plot.ly/~truzmeto/95.embed" height="525px" width="100%"></iframe>
+<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="https://plot.ly/~truzmeto/103.embed" height="525px" width="100%"></iframe>
 
 
 
@@ -1158,7 +1192,7 @@ iplot(fig)
 
 
 
-<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="https://plot.ly/~truzmeto/97.embed" height="525px" width="100%"></iframe>
+<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="https://plot.ly/~truzmeto/105.embed" height="525px" width="100%"></iframe>
 
 
 
@@ -1166,11 +1200,13 @@ iplot(fig)
 
 ![title](./newplot2.png)
 
-
-
 This finalizes or data analysis. Now, we shift the attention to Machine Learning.
 
 ## Machine Learning
+
+Here, using cleaned data we apply predictive modelling to identify if customer loan status is going to be
+good or bad. First we apply min max normalization to numeric features. Then, to avoid issues due to data imbalance
+we increase population of under represented class by simply replicating it. Then, we performe one-hot-encoding on all categorical features. Finally, we split entire data set into 70% training and 30% testing sub sets and data is ready for ML.
 
 ### Feature Normalization
 
@@ -1209,8 +1245,8 @@ df.fillna(0,inplace=True)
 
 ### Simple trick to avoid data imbalance
 
-Double or triple amount of underrepresented class and shuffle. When random forest classifier is used
-it performs resampling anyways. 
+Here, I triple the amount of underrepresented class and shuffle. This makes sure that random forest classifier
+samples equal amouts of data from both classes, when it performs bagging. 
 
 
 ```python
@@ -1246,7 +1282,18 @@ data.shape
 
 
 
-### Train Test Split & Apply ML
+One-hot-encoding blew up number of features from 18 to 81!
+
+### Train Test Split & Apply Random Fores Classification
+
+Random Forest is basically a decision tree method with bagging(bootstrap aggregating).
+Bagging is a resampling technique, where subset of data is drown from original data with
+replacement many many times. By training a model(tree) on each resampled equal size
+subset we get a lot of distinct models that can be built into stronger learner when combined.
+In a Random Forest algorithm, we grow a tree on each resampled N subsets of data and later
+aggregate finale fit of all those trees. Averaging multiple models have similar bias as
+each of the models on its own, and reduced variance because of the average taken. 
+Here I used scikitlearn's Random Forest classifier 'RandomForestClassifier'.
 
 
 ```python
@@ -1272,7 +1319,7 @@ rf.fit(x_train, y_train)
                 max_depth=2, max_features='auto', max_leaf_nodes=None,
                 min_impurity_decrease=0.0, min_impurity_split=None,
                 min_samples_leaf=1, min_samples_split=2,
-                min_weight_fraction_leaf=0.0, n_estimators=400, n_jobs=-1,
+                min_weight_fraction_leaf=0.0, n_estimators=500, n_jobs=-1,
                 oob_score=False, random_state=10, verbose=0, warm_start=False)
 
 
@@ -1288,16 +1335,16 @@ print(confusion_matrix(y_test,pred_test_rf))
 print(classification_report(y_test,pred_test_rf))
 ```
 
-    [[ 9738 60622]
-     [ 4487 98282]]
+    [[ 9072 61208]
+     [ 4387 98462]]
                   precision    recall  f1-score   support
     
-        Bad Loan       0.68      0.14      0.23     70360
-       Good Loan       0.62      0.96      0.75    102769
+        Bad Loan       0.67      0.13      0.22     70280
+       Good Loan       0.62      0.96      0.75    102849
     
        micro avg       0.62      0.62      0.62    173129
-       macro avg       0.65      0.55      0.49    173129
-    weighted avg       0.65      0.62      0.54    173129
+       macro avg       0.65      0.54      0.48    173129
+    weighted avg       0.64      0.62      0.53    173129
     
 
 
@@ -1309,9 +1356,9 @@ plt.figure(figsize = (11,12))
 fs = 14
 n_feat = 25
 feat_importances = pd.Series(rf.feature_importances_, index = x_train.columns)
-feat_importances.nlargest(n_feat).plot(kind='barh', fontsize=14)
-plt.title("Most Important Features", fontsize=fs+2)
-plt.xlabel("Feature Importance", fontsize=fs)
+feat_importances.nlargest(n_feat).plot(kind = 'barh', fontsize = 14)
+plt.title("Most Important Features", fontsize = fs+2)
+plt.xlabel("Feature Importance", fontsize = fs)
 ```
 
 
@@ -1322,20 +1369,23 @@ plt.xlabel("Feature Importance", fontsize=fs)
 
 
 
-![png](output_80_1.png)
+![png](output_81_1.png)
+
+
+* Top most important features happened to be int_rate, loan grade, loan term, debt to credit ratio, sub_grade, home ownership, varification status and annual income. Loan amount didn't show up among top 25 features. 
+
+* Overall prediction accuracy of the model is 62%. It can be further improoved with cross validation
+
+## Conclusion
 
 
 
-```python
+As a result of analysing lendig clubs 2015 Loan dataset the following conclusion is made:
 
-```
+* Data must be carefully pre processed by cleaning, normalizing before any desicion making model is applied.
+* Visual illustration of different features helps to identify correlations and relationship between them. 
+* Rich and upperA class customers were given a nearly 4 times total loan compared to other classes.
+* Loan given for educational or wedding purposes was mostly marked as good loans.
+* Home renters pay more interest on loans compared to home owners or those with mortgage. 
+* Interest rate is found to be the most important factor in classifying good and bad loans.
 
-
-```python
-
-```
-
-
-```python
-
-```
