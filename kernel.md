@@ -4,8 +4,7 @@
 
 ## Introduction
 
-
-In this project, I perform data analysis and predictive modelling on Lending Club's loan dataset for the year 2015 in order to understand how different set of features help to indentify customer loan status.   
+It is crucial for lending companies or banks to make a correct desicion on issuing a loan to their customers. An optimal desicion considers both customer needs and companies interest that increases companies revenue. This optimization process done through risk assesment on individual customer by making comprison to loan/credit history of past or existing customers. In this project, I aim to demonstrate predictive modelling approach that can  potentially predict customer future status using lending clubs 2015 loan data set. 
 
 ## Lending Club Data
 
@@ -75,12 +74,18 @@ We import data by subsetting columns that are relevant and useful in data explor
 
 
 ```python
+#extract data from lending club's website
+#!curl https://resources.lendingclub.com/LoanStats3d.csv.zip > data/LoanStats3d.csv.zip
+```
+
+
+```python
 keep_cols = ["loan_status","loan_amnt", "term","int_rate","installment","grade",
              "sub_grade","purpose","emp_length","home_ownership","annual_inc",
              "verification_status","issue_d","dti","earliest_cr_line","open_acc",
              "revol_bal","revol_util","total_acc"]
 #"zip_code","addr_state"
-df_orig = pd.read_csv("data/loan.csv", usecols=keep_cols,skipfooter=4,skiprows=1)#,low_memory=False)
+df_orig = pd.read_csv("data/LoanStats3d.csv.zip", usecols=keep_cols,skipfooter=4,skiprows=1)#,low_memory=False)
 ```
 
 
@@ -530,7 +535,7 @@ plotLoanStat1(df,colors = ColorList([11,12]))
 ```
 
 
-![png](output_20_0.png)
+![png](output_21_0.png)
 
 
 * Based on fraction of 'Good' and 'Bad' loans, we do have data imbalance problem that must be addressed before applying predictive modelling.
@@ -851,7 +856,7 @@ CPlot(corr_mat = cor.values, axis_labs = corr_names,cmap = cmap,
 ```
 
 
-![png](output_36_0.png)
+![png](output_37_0.png)
 
 
 'loan_amnt' and 'installment' are highly correlated. Therefore, we can drop the 'installments'.
@@ -873,7 +878,7 @@ plotLoanStat2(df,colors)
 ```
 
 
-![png](output_40_0.png)
+![png](output_41_0.png)
 
 
 * Interest rates show a good correlation with loan grade. More interest applied as grade goes down from A to G
@@ -889,7 +894,7 @@ plotLoanStat3(df)
 ```
 
 
-![png](output_43_0.png)
+![png](output_44_0.png)
 
 
 * Home ownership type "ANY" did not show up
@@ -1019,7 +1024,7 @@ ax[1].set_title("Distribution of loan given to lowB class", fontsize=14)
 
 
 
-![png](output_56_1.png)
+![png](output_57_1.png)
 
 
 
@@ -1369,7 +1374,7 @@ plt.xlabel("Feature Importance", fontsize = fs)
 
 
 
-![png](output_81_1.png)
+![png](output_82_1.png)
 
 
 * Top most important features happened to be int_rate, loan grade, loan term, debt to credit ratio, sub_grade, home ownership, varification status and annual income. Loan amount didn't show up among top 25 features. 
@@ -1388,4 +1393,11 @@ As a result of analysing lendig clubs 2015 Loan dataset the following conclusion
 * Loan given for educational or wedding purposes was mostly marked as good loans.
 * Home renters pay more interest on loans compared to home owners or those with mortgage. 
 * Interest rate is found to be the most important factor in classifying good and bad loans.
+* This work needs more feature extraction. Some of the least important features can be eliminated, or combined to create better features. 
+* It also needs more robust imbalances data handling method.
 
+
+
+```python
+
+```
