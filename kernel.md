@@ -4,12 +4,12 @@
 
 ## Introduction
 
-It is crucial for lending companies or banks to make a correct desicion on issuing a loan to their customers. An optimal desicion considers both customer needs and companies interest that increases companies revenue. This optimization process done through risk assesment on individual customer by making comprison to loan/credit history of past or existing customers. In this project, I aim to demonstrate predictive modelling approach that can  potentially predict customer future status using lending clubs 2015 loan data set. 
+It is crucial for lending companies or banks to make a correct desicion on issuing a loan to their customers. An optimal desicion considers both customer needs and companies interest. This optimization process is most often done through risk assesment on individual customer by making comprison to loan/credit history of past or existing customers. In this project, I aim to demonstrate predictive modelling approach that can potentially predict customer future status using lending clubs 2015 loan data set. 
 
 ## Lending Club Data
 
 Lending Club is one of the America's largest lending companies that allows borrowers
-to apply and obtain personal loans, auto refinancing, business loans, and elective medical procedures.
+to apply for and obtain personal loans, auto refinancing, business loans and some other types of loans.
 Additionally, they make some of their data publically available https://www.lendingclub.com/info/download-data.action.  
 
 
@@ -53,7 +53,7 @@ import plotly.graph_objs as go
 #the report look less bulcky
 from src.utility import CleanData, ColorList
 from src.plotting import CPlot,plotLoanStat1, plotLoanStat2, plotLoanStat3
-from src.ml_models import *
+#from src.ml_models import *
 
 #import ml stuff
 from sklearn import preprocessing
@@ -468,7 +468,7 @@ df.head()
 
 Cleaning function did the job by extracting numeric part from mixed data types. Also, we have a new feature that is 'credit age' measured in years. Next we point attantion to a target feature.
 
-### The Target Feature : Loan Status
+### The Target Feature:  Loan Status
 
 
 ```python
@@ -501,6 +501,7 @@ def ChangeStatus(status):
         return 'Good Loan'
     else:
         return 'Bad Loan'
+
 tmp = df['loan_status'].apply(ChangeStatus)
 df.loan_status = tmp
 ```
@@ -1197,13 +1198,18 @@ iplot(fig)
 
 
 
-<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="https://plot.ly/~truzmeto/105.embed" height="525px" width="100%"></iframe>
+<iframe id="igraph" scrolling="no" style="border:none;" seamless="seamless" src="https://plot.ly/~truzmeto/117.embed" height="525px" width="100%"></iframe>
 
 
 
 **Loading static Image**
 
 ![title](./newplot2.png)
+
+
+```python
+
+```
 
 This finalizes or data analysis. Now, we shift the attention to Machine Learning.
 
@@ -1263,7 +1269,7 @@ df = pd.concat([df,df_bad])
 df = shuffle(df)
 ```
 
-### Split target label from data & performe dummy encoding
+### Split target label from data & perform dummy encoding
 
 
 ```python
@@ -1303,16 +1309,16 @@ Here I used scikitlearn's Random Forest classifier 'RandomForestClassifier'.
 
 ```python
 #train test split
-x_train, x_test, y_train, y_test = train_test_split(data, labels, test_size=0.30, random_state=10)
+x_train, x_test, y_train, y_test = train_test_split(data, labels, test_size = 0.30, random_state = 10)
 ```
 
 
 ```python
 from sklearn.ensemble import RandomForestClassifier
-rf = RandomForestClassifier(n_estimators=500,
-                            max_depth=2,
-                            random_state=10,
-                            n_jobs=-1)
+rf = RandomForestClassifier(n_estimators = 500,
+                            max_depth = 2,
+                            random_state = 10,
+                            n_jobs = -1)
 
 rf.fit(x_train, y_train)
 ```
@@ -1336,8 +1342,8 @@ pred_test_rf = rf.predict(x_test)
 
 
 ```python
-print(confusion_matrix(y_test,pred_test_rf))
-print(classification_report(y_test,pred_test_rf))
+print(confusion_matrix(y_test, pred_test_rf))
+print(classification_report(y_test, pred_test_rf))
 ```
 
     [[ 9072 61208]
@@ -1374,7 +1380,7 @@ plt.xlabel("Feature Importance", fontsize = fs)
 
 
 
-![png](output_82_1.png)
+![png](output_83_1.png)
 
 
 * Top most important features happened to be int_rate, loan grade, loan term, debt to credit ratio, sub_grade, home ownership, varification status and annual income. Loan amount didn't show up among top 25 features. 

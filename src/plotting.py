@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from plotly.plotly import iplot
 import plotly.graph_objs as go
-
 import plotly
 plotly.tools.set_credentials_file(username='truzmeto', api_key='56BxCdCGkR66rnyKQMw7')
 
@@ -32,7 +31,7 @@ def plotLoanStat1(df, colors):
     
     sns.barplot(x="issue_month", y="loan_amnt", hue="loan_status",
                 data=df, palette=colors,
-                estimator=lambda x: len(x) / len(df) * 100)
+                estimator=lambda x: 100 * len(x) / len(df) )
     
     ax[1].set(ylabel="(%)")
     ax[1].set(xlabel="Loan Issued Month")
@@ -178,25 +177,25 @@ def CPlot(corr_mat,
             c.append(corr_mat[i,j])
     
     #set tick labels
-    plt.xticks(ytick_pos[0:n], axis_labs,
-               rotation = xtick_lab_rot, fontsize=fs)
+    plt.xticks(xtick_pos[0:n], axis_labs,
+               rotation = xtick_lab_rot, fontsize = fs)
 
     plt.yticks(ytick_pos[0:n], axis_labs,
-               rotation = ytick_lab_rot ,fontsize=fs)       
+               rotation = ytick_lab_rot ,fontsize = fs)       
     
     #set axis labels
-    plt.xlabel(xlab, fontsize=fs)
-    plt.ylabel(ylab, fontsize=fs)
+    plt.xlabel(xlab, fontsize = fs)
+    plt.ylabel(ylab, fontsize = fs)
     
     #set axis range
     plt.xlim((0, n))
     plt.ylim((0, n))
     
     norm = plt.Normalize(-1,1)
-    plt.scatter(xtick_pos,ytick_pos, c = c, s = rad, norm=norm, cmap = cmap)
-    cbar = plt.colorbar(pad=0.06)
+    plt.scatter(xtick_pos, ytick_pos, c = c, s = rad, norm = norm, cmap = cmap)
+    cbar = plt.colorbar(pad = 0.06)
     #cbar.outline.set_visible(False)
-    plt.text(n + 0.75 , n + 0.75, r"$C_{ij}$", fontdict = None, fontsize=fs)
+    #plt.text(n + 0.75 , n + 0.75, r"$C_{ij}$", fontdict = None, fontsize=fs)
 
 
 def init_plotting():
